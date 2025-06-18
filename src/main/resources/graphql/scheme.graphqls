@@ -1,0 +1,35 @@
+type GSTCodes {
+    gstCode:ID,
+    description:String
+    language:String
+    exciseTaxRateCheckIndicator:Boolean
+    gstRateType:String
+    inactiveIndicator:Boolean,
+    updateOn:String
+}
+type GSTCodeDto {
+    gstCode:ID
+    description:String
+
+
+    language:String
+     exciseTaxRateCheckIndicator:Boolean
+     gstRateType:String
+     inactiveIndicator:Boolean
+     updateOn:String
+}
+
+ type GSTCodePage {
+    content: [GSTCodes]
+    totalPages: Int
+    totalElements: Int
+    size: Int
+    number: Int
+}
+
+type Query {
+    fetchGSTCodes(page: Int, size: Int): GSTCodePage
+    fetchGSTRateType(gstRateType:String): [GSTCodes]
+    searchByDescription(keyword:String): [GSTCodeDto]
+}
+

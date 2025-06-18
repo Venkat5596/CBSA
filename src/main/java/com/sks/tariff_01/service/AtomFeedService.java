@@ -7,7 +7,10 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 //import com.sks.tariff_01.config.GSTClient;
+import com.sks.tariff_01.dto.GSTCodesDto;
 import com.sks.tariff_01.entity.GSTCodes;
+import com.sks.tariff_01.exception.custom.GSTNotFound;
+import com.sks.tariff_01.mapper.MapperImpl;
 import com.sks.tariff_01.model.GstCodeDetail;
 import com.sks.tariff_01.repo.GSTCodeRepo;
 import com.sks.tariff_01.unmarshiling.UnMarsh;
@@ -34,16 +37,18 @@ public class AtomFeedService {
     private final RestTemplate restTemplate ;
     private final UnMarsh unmarsh;
     private final GSTCodeRepo repo;
+    private final MapperImpl mapper = new MapperImpl();
     //private final GSTClient client;
 
     @SuppressWarnings("unused")
-    private final String url = "https://ccapi-ipacc.cbsa-asfc.cloud-nuage.canada.ca/v1/tariff-srv/gstCodes";
+    private final String url;
 
     public AtomFeedService(RestTemplate restTemplate, UnMarsh unmarsh, GSTCodeRepo repo) {
         this.restTemplate = restTemplate;
         this.unmarsh = unmarsh;
         this.repo = repo;
        // this.client = client;
+        url = "https://ccapi-ipacc.cbsa-asfc.cloud-nuage.canada.ca/v1/tariff-srv/gstCodes";
     }
 
 
@@ -74,9 +79,12 @@ public class AtomFeedService {
 
             saved.add(detail);
         }
-       // AtomFeedService.getAllCodes(saved);
+        if (saved.isEmpty()) {
+            throw new GSTNotFound("No data found");
+        }
         return new PageImpl<>(saved, pageable, saved.size());
     }
+
 
     public void savedGST(List<GstCodeDetail> details) {
         List<GSTCodes> list = new ArrayList<>();
@@ -97,8 +105,24 @@ public class AtomFeedService {
     }
 
     @Cacheable("gstCodes")
-    public Page<GSTCodes> getAllCodes(@PageableDefault(size = 5) Pageable pageable) {
+    public Page<GSTCodes> getAllCodes( Pageable pageable) {
         return repo.findAll(pageable);
     }
 
+    @Cacheable("gstRateType")
+    public List<GSTCodes> findByGstRateType(String gstRateType) {
+        return repo.findAllByGstRateType( gstRateType);
+    }
+
+
+    public List<GSTCodesDto> searchByDescription(String keyword) {
+
+        List<GSTCodes> gstCodes = repo.searchByDescription(keyword);
+        List<GSTCodesDto> mapped = new ArrayList<>();
+        for (GSTCodes gstCode : gstCodes) {
+          mapped.add(  mapper.map(gstCode));
+        }
+
+        return mapped;
+    }
 }
