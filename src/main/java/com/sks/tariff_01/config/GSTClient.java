@@ -11,4 +11,9 @@ public interface GSTClient {
     // This maps to GET https://.../v1/tariff-srv/gstCodes
     @GetExchange("/gstCodes")
     ResponseEntity<String> fetchGstCodes();
+
+    @GetExchange("/tariffClassifications")
+    ResponseEntity<String> tariffClariffication();
+    @GetExchange("/exciseTaxes")
+    ResponseEntity<String> exciseTaxes();
 }

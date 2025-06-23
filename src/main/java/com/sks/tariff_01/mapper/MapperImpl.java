@@ -2,7 +2,9 @@ package com.sks.tariff_01.mapper;
 
 import com.sks.tariff_01.dto.GSTCodesDto;
 import com.sks.tariff_01.entity.GSTCodes;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MapperImpl {
 
    public GSTCodesDto map(GSTCodes source) {

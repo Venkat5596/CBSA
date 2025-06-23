@@ -32,4 +32,7 @@ type Query {
     fetchGSTRateType(gstRateType:String): [GSTCodes]
     searchByDescription(keyword:String): [GSTCodeDto]
 }
+type Mutation {
+    syncGstCodes(page : Int, size :Int): GSTCodePage
+}
 
